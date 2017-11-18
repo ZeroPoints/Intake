@@ -15,20 +15,22 @@ In Project->Properties
   
 C/C++->General
 
-	  Additional Include Directories: path\OpenAL 1.1 SDK\include
-                                  path\allegro-5.0.10-msvc-11.0\include
+	Additional Include Directories: path\OpenAL 1.1 SDK\include
+                                  	path\allegro-5.0.10-msvc-11.0\include
   
 Linker->Input
 
-	  Additional Dependencies:  OpenAL32.lib, 
-                            allegro-5.0.10-monolith-md-debug.lib
+	Additional Dependencies: OpenAL32.lib, 
+				 allegro-5.0.10-monolith-md-debug.lib
  
  
 Linker->General
-	  Additional Library Directories: path\allegro-5.0.10-msvc-11.0\lib
+
+	Additional Library Directories: path\allegro-5.0.10-msvc-11.0\lib
 
 
 Debugging
-	  Environment: PATH=path\allegro-5.0.10-msvc-11.0\bin;%PATH%
-  
+
+	Environment: PATH=path\allegro-5.0.10-msvc-11.0\bin;%PATH%
+	
   
