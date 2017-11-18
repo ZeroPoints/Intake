@@ -11,7 +11,9 @@ Setting up Open AL and Allegro in VS2015
 
 In Project->Properties
 
-	VC++ Directories->Library Directories: path\OpenAL 1.1 SDK\libs\Win32
+VC++ Directories->Library 
+	
+	Directories: path\OpenAL 1.1 SDK\libs\Win32
   
 C/C++->General
 
