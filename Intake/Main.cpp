@@ -2,8 +2,9 @@
 #include <vector>
 #include <al.h>
 #include <alc.h>
-
-
+#include <iostream>
+#include <fstream>
+#include <string.h>
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_font.h>//fonts
 #include <allegro5\allegro_ttf.h>//fonts
@@ -29,7 +30,8 @@ void RecordAndSave();
 
 
 
-struct WAVE_Format {
+struct WAVE_Format
+{
 
 	char chunkID[5];//"riff"(4)
 	long chunkSize;//sizeof(DWORD)x1(4)
@@ -59,7 +61,8 @@ struct WAVE_Format {
 
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
 
 	std::vector<std::vector<int>> intDataStore;
@@ -81,7 +84,8 @@ int main(int argc, char *argv[]) {
 
 
 
-void Draw(std::vector<std::vector<int>> &intDataStore) {
+void Draw(std::vector<std::vector<int>> &intDataStore)
+{
 
 
 	al_init();
@@ -89,8 +93,8 @@ void Draw(std::vector<std::vector<int>> &intDataStore) {
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	ALLEGRO_TIMER *timer = NULL;
-	display = al_create_display(800, 600);
-	timer = al_create_timer(1.0 / 60);
+	display = al_create_display(1200, 1200);
+	timer = al_create_timer(1.0 / 60.0);
 
 
 	al_init_image_addon();
@@ -118,34 +122,119 @@ void Draw(std::vector<std::vector<int>> &intDataStore) {
 	al_start_timer(timer);
 	ALLEGRO_EVENT ev;
 
-	bool printlines = true;
+	bool printlines = false;
 
 
-	while (!done) {
+	int previousX = 0;
+	int previousY = 0;
+	bool t = false;
+	bool g = false;
+	bool e = false;
+	bool d = false;
+	bool r = false;
+	bool f = false;
+
+	printf("Width=%d\n", intDataStore[0].size());
+	//
+
+
+	int offset = 0;
+	bool rightdown = false;
+	bool leftdown = false;
+
+	/*std::ofstream pFile("datch0.txt");
+	for (const auto &e : intDataStore[0])
+	{
+		pFile << e << "\n";
+	}
+	pFile.close();
+
+	if (intDataStore.size() > 1)
+	{
+		pFile = std::ofstream("datch1.txt");
+		for (const auto &e : intDataStore[1])
+		{
+			pFile << e << "\n";
+		}
+		pFile.close();
+	}*/
+
+	while (!done)
+	{
 		al_wait_for_event(event_queue, &ev);
 		if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
-			//switch (ev.keyboard.keycode)
-			//{
-			//case ALLEGRO_KEY_UP://choose later....
-			//	up = true;
-			//	break;
-			//case ALLEGRO_KEY_DOWN://choose later....
-			//	down = true;
-			//	break;
-			//}
+			switch (ev.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_T://choose later....
+				t = true;
+				break;
+			case ALLEGRO_KEY_G://choose later....
+				g = true;
+				break;
+			case ALLEGRO_KEY_E://choose later....
+				e = true;
+				break;
+			case ALLEGRO_KEY_D://choose later....
+				d = true;
+				break;
+
+			case ALLEGRO_KEY_R://choose later....
+				r = true;
+				break;
+			case ALLEGRO_KEY_F://choose later....
+				f = true;
+				break;
+			case ALLEGRO_KEY_LEFT://choose later....
+				leftdown = true;
+				break;
+			case ALLEGRO_KEY_RIGHT://choose later....
+				rightdown = true;
+				break;
+			}
 		}
 		if (ev.type == ALLEGRO_EVENT_KEY_UP)
 		{
-			//switch (ev.keyboard.keycode)
-			//{
-			//case ALLEGRO_KEY_UP://choose later....
-			//	up = false;
-			//	break;
-			//case ALLEGRO_KEY_DOWN://choose later....
-			//	down = false;
-			//	break;
-			//}
+			switch (ev.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_T://choose later....
+				t = false;
+				break;
+			case ALLEGRO_KEY_G://choose later....
+				g = false;
+				break;
+			case ALLEGRO_KEY_E://choose later....
+				e = false;
+				break;
+			case ALLEGRO_KEY_D://choose later....
+				d = false;
+				break;
+			case ALLEGRO_KEY_R://choose later....
+				r = false;
+				break;
+			case ALLEGRO_KEY_F://choose later....
+				f = false;
+				break;
+			case ALLEGRO_KEY_LEFT://choose later....
+				leftdown = false;
+				break;
+			case ALLEGRO_KEY_RIGHT://choose later....
+				rightdown = false;
+				break;
+			}
+		}
+
+		if (leftdown)
+		{
+			offset -= 50;
+			if (offset <= 0)
+			{
+				offset = 0;
+			}
+		}
+		if (rightdown)
+		{
+			offset += 50;
 		}
 
 		if (ev.type == ALLEGRO_EVENT_TIMER)
@@ -156,39 +245,87 @@ void Draw(std::vector<std::vector<int>> &intDataStore) {
 		{
 			done = true;
 		}
-
 		if (redraw && al_is_event_queue_empty(event_queue))
 		{
 
-			auto i = -1;
+			previousX = 0;
+			previousY = 0;
+			auto i = 1;
 			auto k = 0;
-			for (auto j = 0; j < intDataStore[0].size(); j++) {
-				if (j % 200 == 0) {
-					al_draw_filled_rectangle(10 + (j / 200), 295 + ((intDataStore[k][j]) / 10) * i, 10 + (j / 200) + 1, 295 + 1 + ((intDataStore[k][j]) / 10) * i, al_map_rgb(125, 0, 255));
-					if (printlines) {
-						printf("\n%d", intDataStore[k][j]);
-					}
+
+			for (auto j = offset; j < 1200 + offset; j++)
+			{
+				if (j >= intDataStore[0].size())
+				{
+					break;
+				}
+				int x = 10 + j - offset;
+				int y = 0;
+				if (intDataStore[k][j] >= 127)
+				{
+					y = 400 + ((255 + 127 - intDataStore[k][j])*i);
+				}
+				else
+				{
+					y = 400 + ((127 - intDataStore[k][j])*i);
+				}
+				if (previousX == 0 || previousY == 0)
+				{
+					previousX = x;
+					previousY = y;
+					continue;
+				}
+				al_draw_line(previousX, previousY, x, y, al_map_rgb(255, 0, 125), 1);
+				previousX = x;
+				previousY = y;
+				if (printlines)
+				{
+					printf("\n%d", intDataStore[k][j]);
 				}
 			}
 
 
-			i = 1;
-			k = 1;
-			for (auto j = 0; j < intDataStore[0].size(); j++) {
-				if (j % 200 == 0) {
-					al_draw_filled_rectangle(10 + (j / 200), 305 + ((intDataStore[k][j]) / 10) * i, 10 + (j / 200) + 1, 305 + 1 + ((intDataStore[k][j]) / 10) * i, al_map_rgb(255, 0, 125));
-					if (printlines) {
+			if (intDataStore.size() > 1)
+			{
+
+				previousX = 0;
+				previousY = 0;
+				i = -1;
+				k = 1;
+				for (auto j = offset; j < 1200 + offset; j++)
+				{
+					if (j >= intDataStore[0].size())
+					{
+						break;
+					}
+					int x = 10 + j - offset;
+					int y = 0;
+					if (intDataStore[k][j] >= 127)
+					{
+						y = 400 + ((255 + 127 - intDataStore[k][j])*i);
+					}
+					else
+					{
+						y = 400 + ((127 - intDataStore[k][j])*i);
+					}
+					if (previousX == 0 || previousY == 0)
+					{
+						previousX = x;
+						previousY = y;
+						continue;
+					}
+					al_draw_line(previousX, previousY, x, y, al_map_rgb(255, 0, 125), 1);
+					previousX = x;
+					previousY = y;
+					if (printlines)
+					{
 						printf("\n%d", intDataStore[k][j]);
 					}
 				}
+
 			}
 
-
-
-			al_draw_textf(font30_, al_map_rgb(255, 255, 255), 100, 100, ALLEGRO_ALIGN_CENTRE, "test");//how many frames have been drawn
-
-			printlines = false;
-
+			al_draw_textf(font30_, al_map_rgb(255, 255, 255), 10, 10, ALLEGRO_ALIGN_LEFT, "offset: %d", offset);//how many frames have been drawn
 
 			redraw = false;
 			al_flip_display();
@@ -207,7 +344,8 @@ void Draw(std::vector<std::vector<int>> &intDataStore) {
 
 
 
-void OpenAndListen(std::vector<std::vector<int>> &intDataStore) {
+void OpenAndListen(std::vector<std::vector<int>> &intDataStore)
+{
 
 
 	WAVE_Format sWaveHeader;
@@ -226,7 +364,11 @@ void OpenAndListen(std::vector<std::vector<int>> &intDataStore) {
 
 	//This is wave saving
 	FILE * pFile;
+
+	//fopen_s(&pFile, "sine.wav", "rb");
+	//fopen_s(&pFile, "Alesis-Fusion-Bass-Loop.wav", "rb");
 	fopen_s(&pFile, "myfile.wav", "rb");
+	//myfile.wav
 	fread(sWaveHeader.chunkID, sizeof(char), 4, pFile);             // "RIFF"
 	if (sWaveHeader.chunkID[0] != 'R' || sWaveHeader.chunkID[1] != 'I' || sWaveHeader.chunkID[2] != 'F' || sWaveHeader.chunkID[3] != 'F')
 	{
@@ -306,13 +448,15 @@ void OpenAndListen(std::vector<std::vector<int>> &intDataStore) {
 
 
 
-	for (auto i = 0; i < sWaveHeader.subChunk2Size;) {
-		for (auto j = 0; j < sWaveHeader.channels; j++) {
-			int low = (int)buf[i];
-			i++;
+	for (auto i = 0; i < sWaveHeader.subChunk2Size;)
+	{
+		for (auto j = 0; j < sWaveHeader.channels; j++)
+		{
 			int high = (int)buf[i];
 			i++;
-			int sample = (high << 8) + (low & 0x00ff);
+			int low = (int)buf[i];
+			i++;
+			int sample = (high >> 8) + (low & 0xff);
 
 			intDataStore[j][sampleIndex] = sample;
 
@@ -320,16 +464,30 @@ void OpenAndListen(std::vector<std::vector<int>> &intDataStore) {
 		sampleIndex++;
 	}
 
+	//std::ofstream datbuf0("datbuf0.txt");
+	//for (auto i = 0; i < sWaveHeader.subChunk2Size; i+=2)
+	//{
+	//	datbuf0 << (int)buf[i] << "\n";
+	//}
+	//datbuf0.close();
 
+	//std::ofstream datbuf1("datbuf1.txt");
+	//for (auto i = 1; i < sWaveHeader.subChunk2Size; i += 2)
+	//{
+	//	datbuf1 << (int)buf[i] << "\n";
+	//}
+	//datbuf1.close();
 
 
 	//output prep
 	outputDevice = alcOpenDevice(NULL);
-	if (!outputDevice) {
+	if (!outputDevice)
+	{
 		printf("outputDevice error");
 	}
 	outputContext = alcCreateContext(outputDevice, NULL);
-	if (!alcMakeContextCurrent(outputContext)) {
+	if (!alcMakeContextCurrent(outputContext))
+	{
 		printf("alcMakeContextCurrent error");
 	}
 	alGenSources(1, &outputSource);
@@ -384,19 +542,30 @@ void OpenAndListen(std::vector<std::vector<int>> &intDataStore) {
 	//Set the velocity of the source
 	alSourcefv(outputSource, AL_VELOCITY, SourceVel);
 	//Set if source is looping sound
-	alSourcei(outputSource, AL_LOOPING, AL_FALSE);
+	alSourcei(outputSource, AL_LOOPING, AL_TRUE);
 
 
 	//Actually play the input
 	alSourcePlay(outputSource);
+	printf("subChunk2Size=%d\n", sWaveHeader.subChunk2Size);
+	printf("bytesPerSample=%d\n", sWaveHeader.bytesPerSample);
+	printf("bitsPerSample=%d\n", sWaveHeader.bitsPerSample);
+	printf("avgBytesPerSec=%d\n", sWaveHeader.avgBytesPerSec);
+	printf("sampleRate=%d\n", sWaveHeader.sampleRate);
+	printf("channels=%d\n", sWaveHeader.channels);
 
 
+	printf("Keys h: pause\n");
+	printf("Keys p: play\n");
+	printf("Keys s: stop\n");
+	printf("Keys q: quit\n");
 
 	ALubyte c = ' ';
 	while (c != 'q')
 	{
 		alGetSourcei(outputSource, AL_SOURCE_STATE, &outputSourceState);
-		if (outputSourceState == AL_PLAYING) {
+		if (outputSourceState == AL_PLAYING)
+		{
 			printf("currently playing\n");
 		}
 
@@ -441,7 +610,8 @@ void OpenAndListen(std::vector<std::vector<int>> &intDataStore) {
 
 
 
-void RecordAndSave() {
+void RecordAndSave()
+{
 
 	WAVE_Format sWaveHeader;
 
@@ -468,7 +638,8 @@ void RecordAndSave() {
 
 	//input prep
 	inputDevice = alcCaptureOpenDevice(NULL, FREQ, AL_FORMAT_STEREO16, BUFFERSIZE);
-	if (!inputDevice) {
+	if (!inputDevice)
+	{
 		printf("inputDevice error");
 	}
 
@@ -476,11 +647,13 @@ void RecordAndSave() {
 
 	//output prep
 	outputDevice = alcOpenDevice(NULL);
-	if (!outputDevice) {
+	if (!outputDevice)
+	{
 		printf("outputDevice error");
 	}
 	outputContext = alcCreateContext(outputDevice, NULL);
-	if (!alcMakeContextCurrent(outputContext)) {
+	if (!alcMakeContextCurrent(outputContext))
+	{
 		printf("alcMakeContextCurrent error");
 	}
 	alGenSources(1, &outputSource);
@@ -499,9 +672,11 @@ void RecordAndSave() {
 
 	//Start capturing input
 	alcCaptureStart(inputDevice);
-	while (true) {
+	while (true)
+	{
 		alcGetIntegerv(inputDevice, ALC_CAPTURE_SAMPLES, 1, &inputSample);
-		if (inputSample > BUFFERSIZE) {
+		if (inputSample > BUFFERSIZE)
+		{
 			alcCaptureSamples(inputDevice, inputBuffer, inputSample);
 
 			//Input samples size for different AUDIO samples
@@ -569,7 +744,7 @@ void RecordAndSave() {
 	{
 		printf("loading al buffer error");
 		system("PAUSE");
-		return ;
+		return;
 	}
 
 
@@ -619,7 +794,8 @@ void RecordAndSave() {
 	while (c != 'q')
 	{
 		alGetSourcei(outputSource, AL_SOURCE_STATE, &outputSourceState);
-		if (outputSourceState == AL_PLAYING) {
+		if (outputSourceState == AL_PLAYING)
+		{
 			printf("currently playing\n");
 		}
 
